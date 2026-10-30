@@ -52,6 +52,13 @@ function userWithProfile(overrides: Record<string, unknown>): Record<string, unk
   return userWith({ profile: { bio: "First programmer.", active: true, ...overrides } });
 }
 
+/** A valid user with one root field removed. */
+function userWithout(key: string): Record<string, unknown> {
+  const user = validUser();
+  // Rebuild without the key instead of using `delete`.
+  return Object.fromEntries(Object.entries(user).filter(([k]) => k !== key));
+}
+
 const valid: Fixture[] = [
   {
     name: "valid admin",
@@ -214,4 +221,35 @@ const wrongTypes: Fixture[] = [
   },
 ];
 
-export const fixtures: readonly Fixture[] = [...valid, ...ageBoundaries, ...nameBoundaries, ...emojiLength, ...wrongTypes];
+const missingFields: Fixture[] = [
+  {
+    name: "missing id",
+    group: "missing",
+    input: userWithout("id"),
+    expected: false,
+    why: "Every field is required, including id.",
+  },
+  {
+    name: "missing profile",
+    group: "missing",
+    input: userWithout("profile"),
+    expected: false,
+    why: "The whole profile object is required.",
+  },
+  {
+    name: "missing profile.bio",
+    group: "missing",
+    input: userWith({ profile: { active: true } }),
+    expected: false,
+    why: "Nested fields are required too.",
+  },
+  {
+    name: "empty object",
+    group: "missing",
+    input: {},
+    expected: false,
+    why: "An object with no fields is missing all of them.",
+  },
+];
+
+export const fixtures: readonly Fixture[] = [...valid, ...ageBoundaries, ...nameBoundaries, ...emojiLength, ...wrongTypes, ...missingFields];
