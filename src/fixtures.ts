@@ -114,4 +114,35 @@ const ageBoundaries: Fixture[] = [
   },
 ];
 
-export const fixtures: readonly Fixture[] = [...valid, ...ageBoundaries];
+const nameBoundaries: Fixture[] = [
+  {
+    name: "name empty",
+    group: "name",
+    input: userWith({ name: "" }),
+    expected: false,
+    why: "0 code units is below the minimum of 1.",
+  },
+  {
+    name: "name 1 char",
+    group: "name",
+    input: userWith({ name: "A" }),
+    expected: true,
+    why: "1 code unit is exactly the minimum.",
+  },
+  {
+    name: "name 100 chars",
+    group: "name",
+    input: userWith({ name: "a".repeat(100) }),
+    expected: true,
+    why: "100 code units is exactly the maximum.",
+  },
+  {
+    name: "name 101 chars",
+    group: "name",
+    input: userWith({ name: "a".repeat(101) }),
+    expected: false,
+    why: "101 code units is one over the maximum.",
+  },
+];
+
+export const fixtures: readonly Fixture[] = [...valid, ...ageBoundaries, ...nameBoundaries];
