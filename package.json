@@ -10,11 +10,16 @@
     "node": ">=20.19"
   },
   "scripts": {
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^20.19.43",
+    "eslint": "^10.13.0",
+    "globals": "^17.13.0",
     "tsx": "^4.23.15",
-    "typescript": "~5.9.3"
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.72.1"
   }
 }
