@@ -76,4 +76,42 @@ const valid: Fixture[] = [
   },
 ];
 
-export const fixtures: readonly Fixture[] = [...valid];
+const ageBoundaries: Fixture[] = [
+  {
+    name: "age 17",
+    group: "age",
+    input: userWith({ age: 17 }),
+    expected: false,
+    why: "One below the minimum age of 18.",
+  },
+  {
+    name: "age 18",
+    group: "age",
+    input: userWith({ age: 18 }),
+    expected: true,
+    why: "Exactly the minimum age, which is inclusive.",
+  },
+  {
+    name: "age 120",
+    group: "age",
+    input: userWith({ age: 120 }),
+    expected: true,
+    why: "Exactly the maximum age, which is inclusive.",
+  },
+  {
+    name: "age 121",
+    group: "age",
+    input: userWith({ age: 121 }),
+    expected: false,
+    why: "One above the maximum age of 120.",
+  },
+  {
+    name: "age 18.5",
+    group: "age",
+    input: userWith({ age: 18.5 }),
+    expected: false,
+    why: "In range, but not an integer.",
+  },
+];
+
+export const fixtures: readonly Fixture[] = [...valid, ...ageBoundaries];
