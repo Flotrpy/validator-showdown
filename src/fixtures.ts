@@ -162,4 +162,56 @@ const emojiLength: Fixture[] = [
   },
 ];
 
-export const fixtures: readonly Fixture[] = [...valid, ...ageBoundaries, ...nameBoundaries, ...emojiLength];
+const wrongTypes: Fixture[] = [
+  {
+    name: "age as string",
+    group: "types",
+    input: userWith({ age: "25" }),
+    expected: false,
+    why: 'No coercion: the string "25" is not the number 25.',
+  },
+  {
+    name: "id as number",
+    group: "types",
+    input: userWith({ id: 1 }),
+    expected: false,
+    why: "id must be a string.",
+  },
+  {
+    name: "name as number",
+    group: "types",
+    input: userWith({ name: 42 }),
+    expected: false,
+    why: "name must be a string.",
+  },
+  {
+    name: "tags as string",
+    group: "types",
+    input: userWith({ tags: "math" }),
+    expected: false,
+    why: "tags must be an array, not a single string.",
+  },
+  {
+    name: "active as string",
+    group: "types",
+    input: userWithProfile({ active: "true" }),
+    expected: false,
+    why: 'No coercion: the string "true" is not the boolean true.',
+  },
+  {
+    name: "profile as null",
+    group: "types",
+    input: userWith({ profile: null }),
+    expected: false,
+    why: "profile must be an object, and null is not one.",
+  },
+  {
+    name: "profile as array",
+    group: "types",
+    input: userWith({ profile: [] }),
+    expected: false,
+    why: "profile must be a plain object, not an array.",
+  },
+];
+
+export const fixtures: readonly Fixture[] = [...valid, ...ageBoundaries, ...nameBoundaries, ...emojiLength, ...wrongTypes];
