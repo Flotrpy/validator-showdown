@@ -1,5 +1,6 @@
 import pc from "picocolors";
 import { relativeToRoot, resultsPath, writeJson } from "./lib/files";
+import { writeReports } from "./lib/report";
 import { renderTable } from "./lib/table";
 import { runFixtures, type FixtureResult } from "./lib/run-fixtures";
 
@@ -30,6 +31,7 @@ console.log(renderTable(headers, rows));
 
 const jsonPath = resultsPath("results.json");
 writeJson(jsonPath, comparison);
+writeReports();
 
 const allPassed = summary.failed === 0;
 const line = `${summary.passed}/${summary.checks} checks passed`;
@@ -44,6 +46,7 @@ console.log(
 );
 
 console.log(pc.dim(`\nRaw results saved to ${relativeToRoot(jsonPath)}`));
+console.log(pc.dim(`Report saved to ${relativeToRoot(resultsPath("RESULTS.md"))}`));
 
 if (!allPassed) {
   process.exitCode = 1;
