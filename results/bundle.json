@@ -1,0 +1,24 @@
+{
+  "esbuild": "0.28.2",
+  "settings": "esbuild, bundle, platform=browser, format=esm, minify, target=es2022",
+  "results": [
+    {
+      "validator": "Handwritten",
+      "minified": 832,
+      "gzip": 434,
+      "brotli": 379
+    },
+    {
+      "validator": "Zod",
+      "minified": 454344,
+      "gzip": 93150,
+      "brotli": 76785
+    },
+    {
+      "validator": "Valibot",
+      "minified": 5850,
+      "gzip": 1906,
+      "brotli": 1722
+    }
+  ]
+}
