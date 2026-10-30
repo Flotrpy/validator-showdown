@@ -252,4 +252,28 @@ const missingFields: Fixture[] = [
   },
 ];
 
-export const fixtures: readonly Fixture[] = [...valid, ...ageBoundaries, ...nameBoundaries, ...emojiLength, ...wrongTypes, ...missingFields];
+const invalidRoles: Fixture[] = [
+  {
+    name: "role superadmin",
+    group: "role",
+    input: userWith({ role: "superadmin" }),
+    expected: false,
+    why: 'Only "admin" and "user" are allowed.',
+  },
+  {
+    name: "role Admin",
+    group: "role",
+    input: userWith({ role: "Admin" }),
+    expected: false,
+    why: "Roles are case-sensitive.",
+  },
+  {
+    name: "role empty",
+    group: "role",
+    input: userWith({ role: "" }),
+    expected: false,
+    why: "An empty string is not a role.",
+  },
+];
+
+export const fixtures: readonly Fixture[] = [...valid, ...ageBoundaries, ...nameBoundaries, ...emojiLength, ...wrongTypes, ...missingFields, ...invalidRoles];
