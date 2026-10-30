@@ -384,3 +384,13 @@ validator-showdown/
 5. **Strict objects are not all strict in the same way.** Outside the JSON input domain, an object with an *inherited* key is rejected by Zod and Valibot but accepted by my guard, because they walk keys differently. It does not matter for JSON, but I only know because I tested it.
 6. **A handwritten guard is a promise you have to keep.** It is the smallest and fastest option here, but the only thing stopping it from drifting away from `User` is the fixture suite. The schema libraries get that for free from type inference, and I added an `Expect<Equal<...>>` check so their schemas cannot drift either.
 7. **Generated docs stay honest.** Every table in this README is written by `npm run compare`, `bundle`, or `bench`, and CI fails if the committed results are stale.
+
+## Credit and inspiration
+
+This project was inspired by the DEV Community article [**"I Compared 6 TypeScript Validation Libraries. Here's What Surprised Me"**](https://dev.to/nyaomaru/i-compared-6-typescript-validation-libraries-heres-what-surprised-me-325g) by [nyaomaru](https://dev.to/nyaomaru). Go read it: it covers more libraries and goes deeper.
+
+Validator Showdown is my own smaller reimplementation of that idea, written from scratch to learn it hands-on: three approaches, one contract, and results you can rerun yourself.
+
+## License
+
+[MIT](LICENSE) © Flotrpy
