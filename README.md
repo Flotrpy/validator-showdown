@@ -275,3 +275,26 @@ Node v22.22.0 on linux/x64 (Intel(R) Xeon(R) Processor @ 2.80GHz). 50,000 warmup
 <!-- bench:end -->
 
 > ⚠️ **This is a microbenchmark, not a universal ranking.** It is one small schema, on one machine, on one Node version. CPU, JIT warmup, input shape, and library versions all move these numbers. Every one of these is well under a few microseconds per call, which is fast enough for almost any app. Run it on your own machine before you believe it.
+
+## Side by side
+
+| | Handwritten guard | Zod | Valibot |
+|---|---|---|---|
+| **Source of truth** | The `User` interface. The guard is a second copy of the rules, kept in sync by tests. | The schema. `z.infer<typeof UserSchema>` gives you the type. | The schema. `v.InferOutput<typeof UserSchema>` gives you the type. |
+| **Error details** | `true` or `false`, nothing else. | `safeParse` returns issues with a `path`, `code`, and message, e.g. `unrecognized_keys` naming `email`. | `safeParse` returns issues; `v.getDotPath(issue)` gives `"age"` or `"email"`. |
+| **Transformations** | Write them yourself. | `.transform()`, `.default()`, `z.coerce.*`. | `v.transform()` inside `v.pipe()`, defaults via `v.optional(schema, value)`. |
+| **Build needs** | None. | None. Plain runtime library, no codegen or compiler plugin. | None. Same as Zod. |
+| **Standalone bundle** | Smallest (under 1 kB minified). | Largest of the three here. | A few kB. |
+| **String length rule** | `string.length` (UTF-16 code units). | Built-in `.max()` counts code points. | `v.maxLength()` uses `string.length`. |
+| **Inherited keys** *(not JSON, see tests)* | Ignored: uses `Object.keys`. | Rejected. | Rejected. |
+| **Ecosystem** | None. You own all of it. | The biggest. Most form, API, and tooling integrations support Zod first. | Smaller but growing. Zod and Valibot both implement [Standard Schema](https://standardschema.dev), so tools built on it accept either. |
+
+The error-detail claims are covered by tests in [`tests/zod.test.ts`](tests/zod.test.ts) and [`tests/valibot.test.ts`](tests/valibot.test.ts). The inherited-key row is in [`tests/edge-cases.test.ts`](tests/edge-cases.test.ts).
+
+## Which should you use?
+
+- **One or two small shapes, and bundle size matters a lot?** A handwritten guard. It is tiny and fast. Write fixture tests for it, because nothing else will tell you when it drifts from the type.
+- **You need to tell the user *what* is wrong** (forms, API error responses)? Use a schema library. A boolean guard cannot say "age must be at least 18".
+- **Browser app where every kB counts, and you have several schemas?** Valibot. Its modular design kept the standalone bundle at a few kB here.
+- **Server code, or you want the most integrations, docs, and answers online?** Zod. The bundle cost matters less on a server, and the ecosystem is hard to beat.
+- **Whatever you pick:** decide what "length" means for your strings, and test the boundary with an emoji. The library's default may not be your contract.
