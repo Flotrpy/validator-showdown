@@ -68,7 +68,19 @@ None. All validators agree with each other and with the expected result on every
 | Zod | 90.6 kB | 26.5 kB | 23.5 kB |
 | Valibot | 5.8 kB | 1.9 kB | 1.7 kB |
 
-Measured with esbuild, bundle, platform=browser, format=esm, minify, target=es2022, esbuild 0.28.2. Gzip at level 9, Brotli at quality 11.
+Measured with esbuild 0.28.2 (bundle, platform=browser, format=esm, minify, target=es2022). Gzip at level 9, Brotli at quality 11.
 
 > **Standalone cost only.** Each row bundles one `isUser` and nothing else. In a real app the
-> library is paid for once and shared by every schema, so the gap per extra schema is much smaller.
+> library is paid for once and shared by every schema, so these numbers are not a per-schema cost.
+
+## Runtime benchmark
+
+| Validator | Valid input (median) | Invalid input (median) |
+|---|---:|---:|
+| Handwritten | 172.2 ns | 79.4 ns |
+| Zod | 612.3 ns | 1,635 ns |
+| Valibot | 1,435.3 ns | 765.6 ns |
+
+Node v22.22.0 on linux/x64 (Intel(R) Xeon(R) Processor @ 2.80GHz). 50,000 warmup calls, then 25 samples of 20,000 calls each, cycling through the 8 valid and 33 invalid fixtures.
+
+> **This is a microbenchmark, not a universal ranking. It measures one small schema on one machine and one Node version. CPU, JIT warmup, input shape, and library versions all move these numbers. Use them to get a feel for the order of magnitude, nothing more.**

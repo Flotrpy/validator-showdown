@@ -13,6 +13,7 @@
     "test": "vitest run",
     "compare": "tsx scripts/compare.ts",
     "bundle": "tsx scripts/bundle.ts",
+    "bench": "tsx scripts/bench.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },

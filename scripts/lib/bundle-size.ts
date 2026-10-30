@@ -19,7 +19,7 @@ export interface BundleReport {
   results: BundleResult[];
 }
 
-const SETTINGS = "esbuild, bundle, platform=browser, format=esm, minify, target=es2022";
+const SETTINGS = "bundle, platform=browser, format=esm, minify, target=es2022";
 
 /** Bundles one validator on its own, as if it were the only thing in an app. */
 async function measure(name: string, file: string): Promise<BundleResult> {

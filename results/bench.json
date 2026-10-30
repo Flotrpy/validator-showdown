@@ -1,0 +1,34 @@
+{
+  "environment": {
+    "node": "v22.22.0",
+    "platform": "linux",
+    "arch": "x64",
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.80GHz"
+  },
+  "settings": {
+    "warmupCalls": 50000,
+    "samples": 25,
+    "callsPerSample": 20000
+  },
+  "inputs": {
+    "valid": 8,
+    "invalid": 33
+  },
+  "results": [
+    {
+      "validator": "Handwritten",
+      "validNs": 172.2,
+      "invalidNs": 79.4
+    },
+    {
+      "validator": "Zod",
+      "validNs": 612.3,
+      "invalidNs": 1635
+    },
+    {
+      "validator": "Valibot",
+      "validNs": 1435.3,
+      "invalidNs": 765.6
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "esbuild": "0.28.2",
-  "settings": "esbuild, bundle, platform=browser, format=esm, minify, target=es2022",
+  "settings": "bundle, platform=browser, format=esm, minify, target=es2022",
   "results": [
     {
       "validator": "Handwritten",

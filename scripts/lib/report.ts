@@ -1,3 +1,4 @@
+import type { BenchReport } from "./benchmark";
 import type { BundleReport } from "./bundle-size";
 import { readJson, resultsPath, writeText } from "./files";
 import type { Comparison, FixtureResult } from "./run-fixtures";
@@ -15,6 +16,16 @@ function mark(result: FixtureResult, validator: string): string {
 export function formatBytes(bytes: number): string {
   return bytes < 1000 ? `${bytes} B` : `${(bytes / 1000).toFixed(1)} kB`;
 }
+
+/** Formats nanoseconds like "1,234 ns". */
+export function formatNs(ns: number): string {
+  return `${ns.toLocaleString("en-US", { maximumFractionDigits: 1 })} ns`;
+}
+
+export const BENCH_DISCLAIMER =
+  "This is a microbenchmark, not a universal ranking. It measures one small schema on one " +
+  "machine and one Node version. CPU, JIT warmup, input shape, and library versions all move " +
+  "these numbers. Use them to get a feel for the order of magnitude, nothing more.";
 
 export function renderSummary(comparison: Comparison): string {
   const { summary } = comparison;
@@ -71,10 +82,45 @@ function bundleSection(report: BundleReport | undefined): string[] {
     "",
     renderBundleTable(report),
     "",
-    `Measured with ${report.settings}, esbuild ${report.esbuild}. Gzip at level 9, Brotli at quality 11.`,
+    `Measured with esbuild ${report.esbuild} (${report.settings}). Gzip at level 9, Brotli at quality 11.`,
     "",
     "> **Standalone cost only.** Each row bundles one `isUser` and nothing else. In a real app the",
-    "> library is paid for once and shared by every schema, so the gap per extra schema is much smaller.",
+    "> library is paid for once and shared by every schema, so these numbers are not a per-schema cost.",
+    "",
+  ];
+}
+
+export function renderBenchTable(report: BenchReport): string {
+  const rows = report.results.map(
+    (r) => `| ${r.validator} | ${formatNs(r.validNs)} | ${formatNs(r.invalidNs)} |`,
+  );
+  return [
+    "| Validator | Valid input (median) | Invalid input (median) |",
+    "|---|---:|---:|",
+    ...rows,
+  ].join("\n");
+}
+
+export function describeBenchSetup(report: BenchReport): string {
+  const { environment: env, settings, inputs } = report;
+  return (
+    `Node ${env.node} on ${env.platform}/${env.arch} (${env.cpu}). ` +
+    `${settings.warmupCalls.toLocaleString("en-US")} warmup calls, then ${settings.samples} samples of ` +
+    `${settings.callsPerSample.toLocaleString("en-US")} calls each, cycling through the ` +
+    `${inputs.valid} valid and ${inputs.invalid} invalid fixtures.`
+  );
+}
+
+function benchSection(report: BenchReport | undefined): string[] {
+  if (!report) return [];
+  return [
+    "## Runtime benchmark",
+    "",
+    renderBenchTable(report),
+    "",
+    describeBenchSetup(report),
+    "",
+    `> **${BENCH_DISCLAIMER}**`,
     "",
   ];
 }
@@ -82,9 +128,10 @@ function bundleSection(report: BundleReport | undefined): string[] {
 export interface Reports {
   comparison: Comparison;
   bundle?: BundleReport | undefined;
+  bench?: BenchReport | undefined;
 }
 
-export function renderResultsMarkdown({ comparison, bundle }: Reports): string {
+export function renderResultsMarkdown({ comparison, bundle, bench }: Reports): string {
   return [
     "# Results",
     "",
@@ -105,6 +152,7 @@ export function renderResultsMarkdown({ comparison, bundle }: Reports): string {
     renderResultsTable(comparison),
     "",
     ...bundleSection(bundle),
+    ...benchSection(bench),
   ].join("\n");
 }
 
@@ -115,5 +163,6 @@ export function writeReports(): void {
     throw new Error("results/results.json is missing. Run `npm run compare` first.");
   }
   const bundle = readJson(resultsPath("bundle.json")) as BundleReport | undefined;
-  writeText(resultsPath("RESULTS.md"), renderResultsMarkdown({ comparison, bundle }));
+  const bench = readJson(resultsPath("bench.json")) as BenchReport | undefined;
+  writeText(resultsPath("RESULTS.md"), renderResultsMarkdown({ comparison, bundle, bench }));
 }
