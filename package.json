@@ -15,7 +15,8 @@
     "bundle": "tsx scripts/bundle.ts",
     "bench": "tsx scripts/bench.ts",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "verify": "tsx scripts/verify.ts"
   },
   "dependencies": {
     "valibot": "^1.5.0",
