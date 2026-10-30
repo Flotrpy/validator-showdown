@@ -1,0 +1,2 @@
+# Keep line endings as LF in the repo so diffs and fixtures match on every OS.
+* text=auto eol=lf
