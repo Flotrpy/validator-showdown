@@ -300,4 +300,35 @@ const badTags: Fixture[] = [
   },
 ];
 
-export const fixtures: readonly Fixture[] = [...valid, ...ageBoundaries, ...nameBoundaries, ...emojiLength, ...wrongTypes, ...missingFields, ...invalidRoles, ...badTags];
+const extraKeys: Fixture[] = [
+  {
+    name: "extra root key",
+    group: "extra-keys",
+    input: userWith({ email: "ada@example.com" }),
+    expected: false,
+    why: "email is not part of User, and extra root keys are rejected.",
+  },
+  {
+    name: "extra profile key",
+    group: "extra-keys",
+    input: userWithProfile({ avatar: "ada.png" }),
+    expected: false,
+    why: "Extra keys inside profile are rejected too.",
+  },
+  {
+    name: "extra toString key",
+    group: "extra-keys",
+    input: userWith({ toString: "hi" }),
+    expected: false,
+    why: "toString is a real own key here, not the one inherited from Object.prototype.",
+  },
+  {
+    name: "extra __proto__ key",
+    group: "extra-keys",
+    input: JSON.parse(`{"__proto__": {"admin": true}, ${JSON.stringify(validUser()).slice(1)}`),
+    expected: false,
+    why: "JSON.parse creates __proto__ as an ordinary own key, so it counts as extra.",
+  },
+];
+
+export const fixtures: readonly Fixture[] = [...valid, ...ageBoundaries, ...nameBoundaries, ...emojiLength, ...wrongTypes, ...missingFields, ...invalidRoles, ...badTags, ...extraKeys];
