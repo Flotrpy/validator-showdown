@@ -1,5 +1,6 @@
 import { fixtures, type FixtureGroup } from "../../src/fixtures";
 import { validators } from "../../src/validators";
+import { runUnicodeDemo, type UnicodeDemo } from "./unicode-demo";
 
 export interface FixtureResult {
   name: string;
@@ -28,6 +29,8 @@ export interface Comparison {
   validators: string[];
   fixtures: FixtureResult[];
   summary: ComparisonSummary;
+  /** The 51-emoji name through every length check, including the naive Zod one. */
+  unicodeDemo: UnicodeDemo;
 }
 
 /** Runs every fixture through every validator. */
@@ -61,5 +64,6 @@ export function runFixtures(): Comparison {
       failed,
       disagreements: results.filter((result) => result.disagreement).length,
     },
+    unicodeDemo: runUnicodeDemo(),
   };
 }

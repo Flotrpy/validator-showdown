@@ -1032,5 +1032,32 @@
     "passed": 123,
     "failed": 0,
     "disagreements": 0
+  },
+  "unicodeDemo": {
+    "name": "`\"😀\".repeat(51)`",
+    "utf16Units": 102,
+    "codePoints": 51,
+    "rows": [
+      {
+        "check": "Handwritten guard (`name.length <= 100`)",
+        "accepts": false
+      },
+      {
+        "check": "Zod built-in `z.string().max(100)`",
+        "accepts": true
+      },
+      {
+        "check": "Zod with `.refine()` on `name.length` (used here)",
+        "accepts": false
+      },
+      {
+        "check": "Valibot built-in `v.maxLength(100)`",
+        "accepts": false
+      },
+      {
+        "check": "Valibot validator (used here)",
+        "accepts": false
+      }
+    ]
   }
 }

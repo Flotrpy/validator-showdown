@@ -2,6 +2,7 @@ import type { BenchReport } from "./benchmark";
 import type { BundleReport } from "./bundle-size";
 import { readJson, resultsPath, writeText } from "./files";
 import type { Comparison, FixtureResult } from "./run-fixtures";
+import type { UnicodeDemo } from "./unicode-demo";
 
 /** Escapes text for use inside a markdown table cell. */
 function md(text: string): string {
@@ -42,7 +43,11 @@ export function renderSummary(comparison: Comparison): string {
 export function renderDisagreements(comparison: Comparison): string {
   const rows = comparison.fixtures.filter((r) => r.disagreement || r.failedBy.length > 0);
   if (rows.length === 0) {
-    return "None. All validators agree with each other and with the expected result on every fixture.";
+    return (
+      "None. All validators agree with each other and with the expected result on every fixture. " +
+      "That agreement is not free: Zod only matches because its name rule is a custom `.refine()`. " +
+      "See the next section."
+    );
   }
   return rows
     .map((result) => {
@@ -54,6 +59,23 @@ export function renderDisagreements(comparison: Comparison): string {
       );
     })
     .join("\n");
+}
+
+export function renderUnicodeDemo(demo: UnicodeDemo): string {
+  const rows = demo.rows.map((row) => `| ${row.check} | ${row.accepts ? "accepts ❌" : "rejects ✅"} |`);
+  return [
+    `The name ${demo.name} is **${demo.utf16Units} UTF-16 code units** but only ` +
+      `**${demo.codePoints} code points**. The contract says at most 100 UTF-16 code units, ` +
+      "so the right answer is *reject*.",
+    "",
+    "| Length check | 51 emoji |",
+    "|---|---|",
+    ...rows,
+    "",
+    "Zod's built-in string length counts code points, so `z.string().max(100)` sees 51 and lets it " +
+      "through. JavaScript's `string.length` (used by the handwritten guard and by Valibot's " +
+      "`maxLength`) counts UTF-16 code units and sees 102.",
+  ].join("\n");
 }
 
 export function renderResultsTable(comparison: Comparison): string {
@@ -144,6 +166,10 @@ export function renderResultsMarkdown({ comparison, bundle, bench }: Reports): s
     "## Disagreements",
     "",
     renderDisagreements(comparison),
+    "",
+    "## Same rules, different behavior",
+    "",
+    renderUnicodeDemo(comparison.unicodeDemo),
     "",
     "## Fixture results",
     "",

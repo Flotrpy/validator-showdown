@@ -10,7 +10,21 @@ Disagreements: **none**. Every validator gave the expected answer on every fixtu
 
 ## Disagreements
 
-None. All validators agree with each other and with the expected result on every fixture.
+None. All validators agree with each other and with the expected result on every fixture. That agreement is not free: Zod only matches because its name rule is a custom `.refine()`. See the next section.
+
+## Same rules, different behavior
+
+The name `"😀".repeat(51)` is **102 UTF-16 code units** but only **51 code points**. The contract says at most 100 UTF-16 code units, so the right answer is *reject*.
+
+| Length check | 51 emoji |
+|---|---|
+| Handwritten guard (`name.length <= 100`) | rejects ✅ |
+| Zod built-in `z.string().max(100)` | accepts ❌ |
+| Zod with `.refine()` on `name.length` (used here) | rejects ✅ |
+| Valibot built-in `v.maxLength(100)` | rejects ✅ |
+| Valibot validator (used here) | rejects ✅ |
+
+Zod's built-in string length counts code points, so `z.string().max(100)` sees 51 and lets it through. JavaScript's `string.length` (used by the handwritten guard and by Valibot's `maxLength`) counts UTF-16 code units and sees 102.
 
 ## Fixture results
 
