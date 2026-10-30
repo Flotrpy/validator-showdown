@@ -125,3 +125,30 @@ export function isUser(input: unknown): input is User {
 ```
 
 Both schemas also carry a compile-time check, `Expect<Equal<z.infer<typeof UserSchema>, User>>`, so `npm run typecheck` fails if a schema drifts away from the `User` type.
+
+## Same rules, different behavior: the emoji problem
+
+"Name must be at most 100 characters" sounds like one rule. It is actually a question: **what is a character?**
+
+JavaScript strings are stored as UTF-16. Most letters take one 16-bit *code unit*, but an emoji like 😀 lives outside that range and takes **two**. `string.length` counts code units:
+
+```ts
+"a".length;                    // 1
+"😀".length;                   // 2
+"😀".repeat(51).length;        // 102  <- over the limit
+Array.from("😀".repeat(51)).length; // 51 <- code points
+```
+
+My contract says *1-100 UTF-16 code units*, so 51 emoji (102 units) must be **rejected**.
+
+Here is the surprise: **Zod's built-in `z.string().max(100)` counts Unicode code points, not UTF-16 code units.** It sees 51, not 102, and lets the name through. Valibot's `v.maxLength(100)` and my handwritten guard both use `string.length`, see 102, and reject it.
+
+Nothing is "wrong" with Zod here. Counting code points is arguably closer to what a human means by "character". But it is not *my* contract, and if the database column or the other service downstream counts UTF-16 units, those 51 emoji are a bug waiting to happen. Two validators with the "same" rule gave different answers.
+
+The fix is to say exactly what I mean:
+
+```ts
+name: z.string().refine((name) => name.length >= 1 && name.length <= 100),
+```
+
+With that, all three agree. The two boundary fixtures that catch this are `name 50 emoji` (100 units, valid) and `name 51 emoji` (102 units, invalid), and [`tests/edge-cases.test.ts`](tests/edge-cases.test.ts) pins down Zod's built-in behavior so I find out if it ever changes.
