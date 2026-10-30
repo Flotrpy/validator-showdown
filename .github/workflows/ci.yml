@@ -25,5 +25,5 @@ jobs:
 
       - run: npm run verify
 
-      - name: Check that committed results are up to date
-        run: git diff --exit-code -- results/results.json results/RESULTS.md
+      - name: Check that committed results and README tables are up to date
+        run: git diff --exit-code -- results/results.json results/RESULTS.md README.md

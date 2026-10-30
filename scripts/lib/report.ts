@@ -1,12 +1,14 @@
 import type { BenchReport } from "./benchmark";
 import type { BundleReport } from "./bundle-size";
-import { readJson, resultsPath, writeText } from "./files";
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
+import { readJson, resultsPath, ROOT, writeText } from "./files";
 import type { Comparison, FixtureResult } from "./run-fixtures";
 import type { UnicodeDemo } from "./unicode-demo";
 
-/** Escapes text for use inside a markdown table cell. */
+/** Escapes text for use inside a markdown table cell (pipes, and _ or * that would turn bold). */
 function md(text: string): string {
-  return text.replace(/\|/g, "\\|");
+  return text.replace(/[|_*]/g, (char) => `\\${char}`);
 }
 
 function mark(result: FixtureResult, validator: string): string {
@@ -75,6 +77,24 @@ export function renderUnicodeDemo(demo: UnicodeDemo): string {
     "Zod's built-in string length counts code points, so `z.string().max(100)` sees 51 and lets it " +
       "through. JavaScript's `string.length` (used by the handwritten guard and by Valibot's " +
       "`maxLength`) counts UTF-16 code units and sees 102.",
+  ].join("\n");
+}
+
+/** One row per fixture group: how many checks each validator passed. */
+export function renderGroupTable(comparison: Comparison): string {
+  const groups = [...new Set(comparison.fixtures.map((r) => r.group))];
+  const rows = groups.map((group) => {
+    const inGroup = comparison.fixtures.filter((r) => r.group === group);
+    const scores = comparison.validators.map((v) => {
+      const passed = inGroup.filter((r) => r.actual[v] === r.expected).length;
+      return `${passed === inGroup.length ? "✅" : "❌"} ${passed}/${inGroup.length}`;
+    });
+    return `| ${group} | ${inGroup.length} | ${scores.join(" | ")} |`;
+  });
+  return [
+    `| Group | Fixtures | ${comparison.validators.join(" | ")} |`,
+    `|---|---:|${comparison.validators.map(() => ":---:").join("|")}|`,
+    ...rows,
   ].join("\n");
 }
 
@@ -182,7 +202,57 @@ export function renderResultsMarkdown({ comparison, bundle, bench }: Reports): s
   ].join("\n");
 }
 
-/** Rebuilds results/RESULTS.md from the JSON files in results/. */
+function checksBadge(comparison: Comparison): string {
+  const { passed, checks, failed } = comparison.summary;
+  const color = failed === 0 ? "brightgreen" : "red";
+  const label = encodeURIComponent(`${passed}/${checks} passed`);
+  return `[![checks](https://img.shields.io/badge/checks-${label}-${color})](results/RESULTS.md)`;
+}
+
+function readmeResults(comparison: Comparison): string {
+  return [
+    renderSummary(comparison),
+    "",
+    renderGroupTable(comparison),
+    "",
+    "<details>",
+    `<summary>Every fixture (${comparison.summary.fixtures} rows)</summary>`,
+    "",
+    renderResultsTable(comparison),
+    "",
+    "</details>",
+  ].join("\n");
+}
+
+function readmeBench(bench: BenchReport): string {
+  return [renderBenchTable(bench), "", describeBenchSetup(bench)].join("\n");
+}
+
+/** Replaces the text between <!-- name:start --> and <!-- name:end --> markers. */
+export function replaceBlock(text: string, name: string, content: string): string {
+  const start = `<!-- ${name}:start -->`;
+  const end = `<!-- ${name}:end -->`;
+  const from = text.indexOf(start);
+  const to = text.indexOf(end);
+  if (from === -1 || to === -1 || to < from) return text;
+  return `${text.slice(0, from + start.length)}\n${content}\n${text.slice(to)}`;
+}
+
+/** Copies the generated tables into README.md so the README never drifts from the results. */
+function syncReadme({ comparison, bundle, bench }: Reports): void {
+  const readmePath = path.join(ROOT, "README.md");
+  if (!existsSync(readmePath)) return;
+
+  let text = readFileSync(readmePath, "utf8").replace(/\r\n/g, "\n");
+  text = replaceBlock(text, "checks-badge", checksBadge(comparison));
+  text = replaceBlock(text, "unicode", renderUnicodeDemo(comparison.unicodeDemo));
+  text = replaceBlock(text, "results", readmeResults(comparison));
+  if (bundle) text = replaceBlock(text, "bundle", renderBundleTable(bundle));
+  if (bench) text = replaceBlock(text, "bench", readmeBench(bench));
+  writeText(readmePath, text);
+}
+
+/** Rebuilds results/RESULTS.md and the README tables from the JSON files in results/. */
 export function writeReports(): void {
   const comparison = readJson(resultsPath("results.json")) as Comparison | undefined;
   if (!comparison) {
@@ -191,4 +261,5 @@ export function writeReports(): void {
   const bundle = readJson(resultsPath("bundle.json")) as BundleReport | undefined;
   const bench = readJson(resultsPath("bench.json")) as BenchReport | undefined;
   writeText(resultsPath("RESULTS.md"), renderResultsMarkdown({ comparison, bundle, bench }));
+  syncReadme({ comparison, bundle, bench });
 }

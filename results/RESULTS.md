@@ -66,7 +66,7 @@ Zod's built-in string length counts code points, so `z.string().max(100)` sees 5
 | 32 | extra root key | invalid | ✅ | ✅ | ✅ | email is not part of User, and extra root keys are rejected. |
 | 33 | extra profile key | invalid | ✅ | ✅ | ✅ | Extra keys inside profile are rejected too. |
 | 34 | extra toString key | invalid | ✅ | ✅ | ✅ | toString is a real own key here, not the one inherited from Object.prototype. |
-| 35 | extra __proto__ key | invalid | ✅ | ✅ | ✅ | JSON.parse creates __proto__ as an ordinary own key, so it counts as extra. |
+| 35 | extra \_\_proto\_\_ key | invalid | ✅ | ✅ | ✅ | JSON.parse creates \_\_proto\_\_ as an ordinary own key, so it counts as extra. |
 | 36 | null | invalid | ✅ | ✅ | ✅ | typeof null is "object", but null is not a user. |
 | 37 | empty array | invalid | ✅ | ✅ | ✅ | Arrays are objects in JavaScript, but not users. |
 | 38 | array of a user | invalid | ✅ | ✅ | ✅ | A list containing a valid user is still a list. |
