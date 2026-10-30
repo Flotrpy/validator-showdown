@@ -374,3 +374,13 @@ validator-showdown/
 ├── vitest.config.ts
 └── package.json
 ```
+
+## What I learned
+
+1. **"Same rule" is not the same behavior.** I wrote "max 100 characters" three times and got two different answers until I said exactly which characters I meant. The 51-emoji fixture is now the first test I would write for any string limit.
+2. **Read your library's definition of length.** Zod's built-in string length counts code points. Valibot's `maxLength` and JavaScript's `string.length` count UTF-16 code units. Neither is wrong; they are just different contracts.
+3. **How you import matters as much as what you import.** The first bundle measurement in this repo's history had Zod at 454.3 kB minified with `import { z } from "zod"`. Switching to `import * as z from "zod"`, as the Zod docs recommend, brought it down to 90.6 kB with the same schema.
+4. **Small bundle and fast runtime are different things.** In my benchmark, Valibot had the smallest library bundle but was slower than Zod on valid input, while Zod was the slowest on invalid input. The handwritten guard won both, which is what you would expect from code that does nothing extra.
+5. **Strict objects are not all strict in the same way.** Outside the JSON input domain, an object with an *inherited* key is rejected by Zod and Valibot but accepted by my guard, because they walk keys differently. It does not matter for JSON, but I only know because I tested it.
+6. **A handwritten guard is a promise you have to keep.** It is the smallest and fastest option here, but the only thing stopping it from drifting away from `User` is the fixture suite. The schema libraries get that for free from type inference, and I added an `Expect<Equal<...>>` check so their schemas cannot drift either.
+7. **Generated docs stay honest.** Every table in this README is written by `npm run compare`, `bundle`, or `bench`, and CI fails if the committed results are stale.
