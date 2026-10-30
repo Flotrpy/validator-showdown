@@ -1,0 +1,12 @@
+{
+  "name": "validator-showdown",
+  "version": "1.0.0",
+  "description": "Same data, same rules, three TypeScript validators: a handwritten guard vs Zod vs Valibot, tested side by side.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "author": "Flotrpy",
+  "engines": {
+    "node": ">=20.19"
+  }
+}
