@@ -59,8 +59,3 @@ export async function measureBundles(): Promise<BundleReport> {
   }
   return { esbuild: esbuildVersion, settings: SETTINGS, results };
 }
-
-/** Formats a byte count like "1.2 kB" (1 kB = 1000 bytes). */
-export function formatBytes(bytes: number): string {
-  return bytes < 1000 ? `${bytes} B` : `${(bytes / 1000).toFixed(1)} kB`;
-}

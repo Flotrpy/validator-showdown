@@ -59,3 +59,16 @@ None. All validators agree with each other and with the expected result on every
 | 39 | string | invalid | ✅ | ✅ | ✅ | A string is not an object. |
 | 40 | number | invalid | ✅ | ✅ | ✅ | A number is not an object. |
 | 41 | boolean | invalid | ✅ | ✅ | ✅ | A boolean is not an object. |
+
+## Bundle size
+
+| Validator | Minified | Gzip | Brotli |
+|---|---:|---:|---:|
+| Handwritten | 832 B | 434 B | 379 B |
+| Zod | 90.6 kB | 26.5 kB | 23.5 kB |
+| Valibot | 5.8 kB | 1.9 kB | 1.7 kB |
+
+Measured with esbuild, bundle, platform=browser, format=esm, minify, target=es2022, esbuild 0.28.2. Gzip at level 9, Brotli at quality 11.
+
+> **Standalone cost only.** Each row bundles one `isUser` and nothing else. In a real app the
+> library is paid for once and shared by every schema, so the gap per extra schema is much smaller.

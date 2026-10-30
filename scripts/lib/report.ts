@@ -1,3 +1,4 @@
+import type { BundleReport } from "./bundle-size";
 import { readJson, resultsPath, writeText } from "./files";
 import type { Comparison, FixtureResult } from "./run-fixtures";
 
@@ -8,6 +9,11 @@ function md(text: string): string {
 
 function mark(result: FixtureResult, validator: string): string {
   return result.actual[validator] === result.expected ? "✅" : "❌";
+}
+
+/** Formats a byte count like "1.2 kB" (1 kB = 1000 bytes). */
+export function formatBytes(bytes: number): string {
+  return bytes < 1000 ? `${bytes} B` : `${(bytes / 1000).toFixed(1)} kB`;
 }
 
 export function renderSummary(comparison: Comparison): string {
@@ -50,7 +56,35 @@ export function renderResultsTable(comparison: Comparison): string {
   return [header, divider, ...rows].join("\n");
 }
 
-export function renderResultsMarkdown(comparison: Comparison): string {
+export function renderBundleTable(report: BundleReport): string {
+  const rows = report.results.map(
+    (r) =>
+      `| ${r.validator} | ${formatBytes(r.minified)} | ${formatBytes(r.gzip)} | ${formatBytes(r.brotli)} |`,
+  );
+  return ["| Validator | Minified | Gzip | Brotli |", "|---|---:|---:|---:|", ...rows].join("\n");
+}
+
+function bundleSection(report: BundleReport | undefined): string[] {
+  if (!report) return [];
+  return [
+    "## Bundle size",
+    "",
+    renderBundleTable(report),
+    "",
+    `Measured with ${report.settings}, esbuild ${report.esbuild}. Gzip at level 9, Brotli at quality 11.`,
+    "",
+    "> **Standalone cost only.** Each row bundles one `isUser` and nothing else. In a real app the",
+    "> library is paid for once and shared by every schema, so the gap per extra schema is much smaller.",
+    "",
+  ];
+}
+
+export interface Reports {
+  comparison: Comparison;
+  bundle?: BundleReport | undefined;
+}
+
+export function renderResultsMarkdown({ comparison, bundle }: Reports): string {
   return [
     "# Results",
     "",
@@ -70,6 +104,7 @@ export function renderResultsMarkdown(comparison: Comparison): string {
     "",
     renderResultsTable(comparison),
     "",
+    ...bundleSection(bundle),
   ].join("\n");
 }
 
@@ -79,5 +114,6 @@ export function writeReports(): void {
   if (!comparison) {
     throw new Error("results/results.json is missing. Run `npm run compare` first.");
   }
-  writeText(resultsPath("RESULTS.md"), renderResultsMarkdown(comparison));
+  const bundle = readJson(resultsPath("bundle.json")) as BundleReport | undefined;
+  writeText(resultsPath("RESULTS.md"), renderResultsMarkdown({ comparison, bundle }));
 }

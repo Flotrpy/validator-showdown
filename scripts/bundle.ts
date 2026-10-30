@@ -1,11 +1,13 @@
 import pc from "picocolors";
-import { formatBytes, measureBundles } from "./lib/bundle-size";
+import { measureBundles } from "./lib/bundle-size";
 import { relativeToRoot, resultsPath, writeJson } from "./lib/files";
+import { formatBytes, writeReports } from "./lib/report";
 import { renderTable } from "./lib/table";
 
 const report = await measureBundles();
 const jsonPath = resultsPath("bundle.json");
 writeJson(jsonPath, report);
+writeReports();
 
 console.log(pc.bold("\nBundle size per validator (standalone)\n"));
 console.log(pc.dim(`${report.settings}, esbuild ${report.esbuild}\n`));
