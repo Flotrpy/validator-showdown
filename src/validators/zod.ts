@@ -1,4 +1,4 @@
-import { z } from "zod";
+import * as z from "zod";
 import { RULES, type User } from "../types";
 import type { Equal, Expect } from "../type-utils";
 

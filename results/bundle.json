@@ -10,9 +10,9 @@
     },
     {
       "validator": "Zod",
-      "minified": 454344,
-      "gzip": 93150,
-      "brotli": 76785
+      "minified": 90625,
+      "gzip": 26466,
+      "brotli": 23523
     },
     {
       "validator": "Valibot",
