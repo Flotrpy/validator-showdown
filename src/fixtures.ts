@@ -276,4 +276,28 @@ const invalidRoles: Fixture[] = [
   },
 ];
 
-export const fixtures: readonly Fixture[] = [...valid, ...ageBoundaries, ...nameBoundaries, ...emojiLength, ...wrongTypes, ...missingFields, ...invalidRoles];
+const badTags: Fixture[] = [
+  {
+    name: "tag is number",
+    group: "tags",
+    input: userWith({ tags: ["math", 7] }),
+    expected: false,
+    why: "Every tag must be a string, and 7 is a number.",
+  },
+  {
+    name: "tag is null",
+    group: "tags",
+    input: userWith({ tags: [null] }),
+    expected: false,
+    why: "null is not a string.",
+  },
+  {
+    name: "tag is nested array",
+    group: "tags",
+    input: userWith({ tags: [["math"]] }),
+    expected: false,
+    why: "tags is a flat array of strings, not an array of arrays.",
+  },
+];
+
+export const fixtures: readonly Fixture[] = [...valid, ...ageBoundaries, ...nameBoundaries, ...emojiLength, ...wrongTypes, ...missingFields, ...invalidRoles, ...badTags];
