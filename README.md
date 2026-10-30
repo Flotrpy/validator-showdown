@@ -56,3 +56,72 @@ interface User {
 - Input is ordinary JSON-decoded data.
 
 Every validator exports the same function: `isUser(input: unknown): input is User`.
+
+## The three contenders
+
+### 1. Handwritten type guard: no library
+
+Plain TypeScript. Every rule is an `if` I wrote myself. [`src/validators/handwritten.ts`](src/validators/handwritten.ts)
+
+```ts
+export function isUser(input: unknown): input is User {
+  if (!isPlainObject(input) || !hasExactKeys(input, USER_KEYS)) return false;
+
+  return (
+    typeof input.id === "string" &&
+    isValidName(input.name) &&        // typeof string, 1 <= length <= 100
+    isValidAge(input.age) &&          // Number.isInteger, 18-120
+    isValidRole(input.role) &&
+    isStringArray(input.tags) &&
+    isValidProfile(input.profile)     // exact keys, bio string, active boolean
+  );
+}
+```
+
+Zero dependencies, nothing to learn. The catch: the `User` interface and the guard are two separate things, and nothing but tests keeps them in sync.
+
+### 2. Zod: `z.strictObject`
+
+The schema is the source of truth, and the type can be inferred from it. [`src/validators/zod.ts`](src/validators/zod.ts)
+
+```ts
+import * as z from "zod";
+
+export const UserSchema = z.strictObject({
+  id: z.string(),
+  name: z.string().refine((name) => name.length >= 1 && name.length <= 100),
+  age: z.int().min(18).max(120),
+  role: z.enum(["admin", "user"]),
+  tags: z.array(z.string()),
+  profile: z.strictObject({ bio: z.string(), active: z.boolean() }),
+});
+
+export function isUser(input: unknown): input is User {
+  return UserSchema.safeParse(input).success;
+}
+```
+
+Why `.refine()` instead of `.min(1).max(100)`? That is the whole next section.
+
+### 3. Valibot: `v.strictObject` + `v.is()`
+
+Same idea as Zod, but built from small functions you pipe together. [`src/validators/valibot.ts`](src/validators/valibot.ts)
+
+```ts
+import * as v from "valibot";
+
+export const UserSchema = v.strictObject({
+  id: v.string(),
+  name: v.pipe(v.string(), v.minLength(1), v.maxLength(100)),
+  age: v.pipe(v.number(), v.integer(), v.minValue(18), v.maxValue(120)),
+  role: v.picklist(["admin", "user"]),
+  tags: v.array(v.string()),
+  profile: v.strictObject({ bio: v.string(), active: v.boolean() }),
+});
+
+export function isUser(input: unknown): input is User {
+  return v.is(UserSchema, input);
+}
+```
+
+Both schemas also carry a compile-time check, `Expect<Equal<z.infer<typeof UserSchema>, User>>`, so `npm run typecheck` fails if a schema drifts away from the `User` type.
