@@ -1,4 +1,5 @@
 import pc from "picocolors";
+import { relativeToRoot, resultsPath, writeJson } from "./lib/files";
 import { renderTable } from "./lib/table";
 import { runFixtures, type FixtureResult } from "./lib/run-fixtures";
 
@@ -27,6 +28,9 @@ const rows = comparison.fixtures.map((result) => [
 console.log(pc.bold("\nValidator Showdown: every fixture through every validator\n"));
 console.log(renderTable(headers, rows));
 
+const jsonPath = resultsPath("results.json");
+writeJson(jsonPath, comparison);
+
 const allPassed = summary.failed === 0;
 const line = `${summary.passed}/${summary.checks} checks passed`;
 console.log(
@@ -38,6 +42,8 @@ console.log(
     ? pc.green("No disagreements: all validators gave the same answer on every fixture.")
     : pc.yellow(`${summary.disagreements} fixture(s) where validators disagree. See the DISAGREE rows.`),
 );
+
+console.log(pc.dim(`\nRaw results saved to ${relativeToRoot(jsonPath)}`));
 
 if (!allPassed) {
   process.exitCode = 1;

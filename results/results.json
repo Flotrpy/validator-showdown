@@ -1,0 +1,1036 @@
+{
+  "validators": [
+    "Handwritten",
+    "Zod",
+    "Valibot"
+  ],
+  "fixtures": [
+    {
+      "name": "valid admin",
+      "group": "valid",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": true,
+      "why": "Every field is present, has the right type, and is in range.",
+      "actual": {
+        "Handwritten": true,
+        "Zod": true,
+        "Valibot": true
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "valid user, no tags",
+      "group": "valid",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "user",
+        "tags": [],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": true,
+      "why": "An empty tags array is still an array of strings.",
+      "actual": {
+        "Handwritten": true,
+        "Zod": true,
+        "Valibot": true
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "valid user, empty bio",
+      "group": "valid",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "",
+          "active": false
+        }
+      },
+      "expected": true,
+      "why": "bio has no length rule, and active may be false.",
+      "actual": {
+        "Handwritten": true,
+        "Zod": true,
+        "Valibot": true
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "age 17",
+      "group": "age",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 17,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": false,
+      "why": "One below the minimum age of 18.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "age 18",
+      "group": "age",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 18,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": true,
+      "why": "Exactly the minimum age, which is inclusive.",
+      "actual": {
+        "Handwritten": true,
+        "Zod": true,
+        "Valibot": true
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "age 120",
+      "group": "age",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 120,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": true,
+      "why": "Exactly the maximum age, which is inclusive.",
+      "actual": {
+        "Handwritten": true,
+        "Zod": true,
+        "Valibot": true
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "age 121",
+      "group": "age",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 121,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": false,
+      "why": "One above the maximum age of 120.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "age 18.5",
+      "group": "age",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 18.5,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": false,
+      "why": "In range, but not an integer.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "name empty",
+      "group": "name",
+      "input": {
+        "id": "u_001",
+        "name": "",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": false,
+      "why": "0 code units is below the minimum of 1.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "name 1 char",
+      "group": "name",
+      "input": {
+        "id": "u_001",
+        "name": "A",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": true,
+      "why": "1 code unit is exactly the minimum.",
+      "actual": {
+        "Handwritten": true,
+        "Zod": true,
+        "Valibot": true
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "name 100 chars",
+      "group": "name",
+      "input": {
+        "id": "u_001",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": true,
+      "why": "100 code units is exactly the maximum.",
+      "actual": {
+        "Handwritten": true,
+        "Zod": true,
+        "Valibot": true
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "name 101 chars",
+      "group": "name",
+      "input": {
+        "id": "u_001",
+        "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": false,
+      "why": "101 code units is one over the maximum.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "name 50 emoji",
+      "group": "emoji",
+      "input": {
+        "id": "u_001",
+        "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": true,
+      "why": "Each 😀 is 2 UTF-16 code units, so 50 of them is exactly 100.",
+      "actual": {
+        "Handwritten": true,
+        "Zod": true,
+        "Valibot": true
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "name 51 emoji",
+      "group": "emoji",
+      "input": {
+        "id": "u_001",
+        "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": false,
+      "why": "51 emoji is only 51 code points but 102 UTF-16 code units, over the limit.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "age as string",
+      "group": "types",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": "25",
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": false,
+      "why": "No coercion: the string \"25\" is not the number 25.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "id as number",
+      "group": "types",
+      "input": {
+        "id": 1,
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": false,
+      "why": "id must be a string.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "name as number",
+      "group": "types",
+      "input": {
+        "id": "u_001",
+        "name": 42,
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": false,
+      "why": "name must be a string.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "tags as string",
+      "group": "types",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "admin",
+        "tags": "math",
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": false,
+      "why": "tags must be an array, not a single string.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "active as string",
+      "group": "types",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": "true"
+        }
+      },
+      "expected": false,
+      "why": "No coercion: the string \"true\" is not the boolean true.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "profile as null",
+      "group": "types",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": null
+      },
+      "expected": false,
+      "why": "profile must be an object, and null is not one.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "profile as array",
+      "group": "types",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": []
+      },
+      "expected": false,
+      "why": "profile must be a plain object, not an array.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "missing id",
+      "group": "missing",
+      "input": {
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": false,
+      "why": "Every field is required, including id.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "missing profile",
+      "group": "missing",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ]
+      },
+      "expected": false,
+      "why": "The whole profile object is required.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "missing profile.bio",
+      "group": "missing",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "active": true
+        }
+      },
+      "expected": false,
+      "why": "Nested fields are required too.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "empty object",
+      "group": "missing",
+      "input": {},
+      "expected": false,
+      "why": "An object with no fields is missing all of them.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "role superadmin",
+      "group": "role",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "superadmin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": false,
+      "why": "Only \"admin\" and \"user\" are allowed.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "role Admin",
+      "group": "role",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "Admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": false,
+      "why": "Roles are case-sensitive.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "role empty",
+      "group": "role",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": false,
+      "why": "An empty string is not a role.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "tag is number",
+      "group": "tags",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          7
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": false,
+      "why": "Every tag must be a string, and 7 is a number.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "tag is null",
+      "group": "tags",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          null
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": false,
+      "why": "null is not a string.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "tag is nested array",
+      "group": "tags",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          [
+            "math"
+          ]
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": false,
+      "why": "tags is a flat array of strings, not an array of arrays.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "extra root key",
+      "group": "extra-keys",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        },
+        "email": "ada@example.com"
+      },
+      "expected": false,
+      "why": "email is not part of User, and extra root keys are rejected.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "extra profile key",
+      "group": "extra-keys",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true,
+          "avatar": "ada.png"
+        }
+      },
+      "expected": false,
+      "why": "Extra keys inside profile are rejected too.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "extra toString key",
+      "group": "extra-keys",
+      "input": {
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        },
+        "toString": "hi"
+      },
+      "expected": false,
+      "why": "toString is a real own key here, not the one inherited from Object.prototype.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "extra __proto__ key",
+      "group": "extra-keys",
+      "input": {
+        "__proto__": {
+          "admin": true
+        },
+        "id": "u_001",
+        "name": "Ada Lovelace",
+        "age": 36,
+        "role": "admin",
+        "tags": [
+          "math",
+          "engines"
+        ],
+        "profile": {
+          "bio": "First programmer.",
+          "active": true
+        }
+      },
+      "expected": false,
+      "why": "JSON.parse creates __proto__ as an ordinary own key, so it counts as extra.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "null",
+      "group": "non-object",
+      "input": null,
+      "expected": false,
+      "why": "typeof null is \"object\", but null is not a user.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "empty array",
+      "group": "non-object",
+      "input": [],
+      "expected": false,
+      "why": "Arrays are objects in JavaScript, but not users.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "array of a user",
+      "group": "non-object",
+      "input": [
+        {
+          "id": "u_001",
+          "name": "Ada Lovelace",
+          "age": 36,
+          "role": "admin",
+          "tags": [
+            "math",
+            "engines"
+          ],
+          "profile": {
+            "bio": "First programmer.",
+            "active": true
+          }
+        }
+      ],
+      "expected": false,
+      "why": "A list containing a valid user is still a list.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "string",
+      "group": "non-object",
+      "input": "Ada Lovelace",
+      "expected": false,
+      "why": "A string is not an object.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "number",
+      "group": "non-object",
+      "input": 36,
+      "expected": false,
+      "why": "A number is not an object.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    },
+    {
+      "name": "boolean",
+      "group": "non-object",
+      "input": true,
+      "expected": false,
+      "why": "A boolean is not an object.",
+      "actual": {
+        "Handwritten": false,
+        "Zod": false,
+        "Valibot": false
+      },
+      "failedBy": [],
+      "disagreement": false
+    }
+  ],
+  "summary": {
+    "fixtures": 41,
+    "validators": 3,
+    "checks": 123,
+    "passed": 123,
+    "failed": 0,
+    "disagreements": 0
+  }
+}
