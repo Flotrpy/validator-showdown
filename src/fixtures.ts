@@ -145,4 +145,21 @@ const nameBoundaries: Fixture[] = [
   },
 ];
 
-export const fixtures: readonly Fixture[] = [...valid, ...ageBoundaries, ...nameBoundaries];
+const emojiLength: Fixture[] = [
+  {
+    name: "name 50 emoji",
+    group: "emoji",
+    input: userWith({ name: "😀".repeat(50) }),
+    expected: true,
+    why: "Each 😀 is 2 UTF-16 code units, so 50 of them is exactly 100.",
+  },
+  {
+    name: "name 51 emoji",
+    group: "emoji",
+    input: userWith({ name: "😀".repeat(51) }),
+    expected: false,
+    why: "51 emoji is only 51 code points but 102 UTF-16 code units, over the limit.",
+  },
+];
+
+export const fixtures: readonly Fixture[] = [...valid, ...ageBoundaries, ...nameBoundaries, ...emojiLength];
