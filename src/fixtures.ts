@@ -331,4 +331,61 @@ const extraKeys: Fixture[] = [
   },
 ];
 
-export const fixtures: readonly Fixture[] = [...valid, ...ageBoundaries, ...nameBoundaries, ...emojiLength, ...wrongTypes, ...missingFields, ...invalidRoles, ...badTags, ...extraKeys];
+const nonObjects: Fixture[] = [
+  {
+    name: "null",
+    group: "non-object",
+    input: null,
+    expected: false,
+    why: 'typeof null is "object", but null is not a user.',
+  },
+  {
+    name: "empty array",
+    group: "non-object",
+    input: [],
+    expected: false,
+    why: "Arrays are objects in JavaScript, but not users.",
+  },
+  {
+    name: "array of a user",
+    group: "non-object",
+    input: [validUser()],
+    expected: false,
+    why: "A list containing a valid user is still a list.",
+  },
+  {
+    name: "string",
+    group: "non-object",
+    input: "Ada Lovelace",
+    expected: false,
+    why: "A string is not an object.",
+  },
+  {
+    name: "number",
+    group: "non-object",
+    input: 36,
+    expected: false,
+    why: "A number is not an object.",
+  },
+  {
+    name: "boolean",
+    group: "non-object",
+    input: true,
+    expected: false,
+    why: "A boolean is not an object.",
+  },
+];
+
+/** Every fixture, in the order they appear in tables. */
+export const fixtures: readonly Fixture[] = [
+  ...valid,
+  ...ageBoundaries,
+  ...nameBoundaries,
+  ...emojiLength,
+  ...wrongTypes,
+  ...missingFields,
+  ...invalidRoles,
+  ...badTags,
+  ...extraKeys,
+  ...nonObjects,
+];
