@@ -298,3 +298,79 @@ The error-detail claims are covered by tests in [`tests/zod.test.ts`](tests/zod.
 - **Browser app where every kB counts, and you have several schemas?** Valibot. Its modular design kept the standalone bundle at a few kB here.
 - **Server code, or you want the most integrations, docs, and answers online?** Zod. The bundle cost matters less on a server, and the ecosystem is hard to beat.
 - **Whatever you pick:** decide what "length" means for your strings, and test the boundary with an emoji. The library's default may not be your contract.
+
+## Quick start
+
+You need [Node.js](https://nodejs.org) 20.19 or newer and npm. Every command works the same in PowerShell, cmd, macOS Terminal, and Linux shells.
+
+```bash
+git clone https://github.com/Flotrpy/validator-showdown.git
+```
+
+```bash
+cd validator-showdown
+```
+
+```bash
+npm install
+```
+
+```bash
+npm test
+```
+
+```bash
+npm run compare
+```
+
+```bash
+npm run verify
+```
+
+| Script | What it does |
+|---|---|
+| `npm test` | Runs all Vitest test files. |
+| `npm run compare` | Prints the color-coded results table and writes `results/results.json`, `results/RESULTS.md`, and the README tables. Fails if any check fails. |
+| `npm run bundle` | Measures each validator's standalone bundle size (minified, gzip, Brotli). |
+| `npm run bench` | Runs the microbenchmark. Takes a few seconds. |
+| `npm run lint` | ESLint with strict type-checked rules. |
+| `npm run typecheck` | `tsc --noEmit` in strict mode. |
+| `npm run verify` | lint, typecheck, test, and compare, in order. Stops at the first failure. |
+
+## Project structure
+
+```text
+validator-showdown/
+├── src/
+│   ├── types.ts               # the shared User type and its limits
+│   ├── type-utils.ts          # Equal/Expect compile-time type checks
+│   ├── fixtures.ts            # 41 shared fixtures: input, expected, why
+│   └── validators/
+│       ├── handwritten.ts     # plain TypeScript guard
+│       ├── zod.ts             # z.strictObject + refine
+│       ├── valibot.ts         # v.strictObject + v.is()
+│       └── index.ts           # list of all validators
+├── tests/
+│   ├── handwritten.test.ts
+│   ├── zod.test.ts
+│   ├── valibot.test.ts
+│   ├── agreement.test.ts      # all validators agree on every fixture
+│   ├── edge-cases.test.ts     # boundaries, emoji, extra keys
+│   └── immutability.test.ts   # input is never mutated
+├── scripts/
+│   ├── compare.ts             # npm run compare
+│   ├── bundle.ts              # npm run bundle
+│   ├── bench.ts               # npm run bench
+│   ├── verify.ts              # npm run verify
+│   └── lib/                   # table, report, bundle, benchmark helpers
+├── results/
+│   ├── results.json           # raw compare output
+│   ├── bundle.json            # raw bundle sizes
+│   ├── bench.json             # raw benchmark numbers
+│   └── RESULTS.md             # readable report
+├── .github/workflows/ci.yml   # verify on Windows, macOS, Linux
+├── eslint.config.js
+├── tsconfig.json
+├── vitest.config.ts
+└── package.json
+```
